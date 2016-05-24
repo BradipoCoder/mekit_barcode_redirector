@@ -15,21 +15,21 @@ function mekit_barcode_redirector_menu() {
 
 /**
  * @param string $barcode
+ * @return bool|array
  */
 function mekit_barcode_redirector_search($barcode) {
   $barcode = _mekit_barcode_cleanup_barcode($barcode);
   if (!$barcode || empty($barcode) || strlen($barcode) != 13) {
-    echo(t("Malformed barcode!"));
-    return;
+    return _mekit_barcode_get_error_message(t("Malformed barcode!"));
   }
 
   $nid = _mekit_barcode_get_nid_by_barcode($barcode);
   if (!$nid) {
-    echo(t("Unregistered barcode!"));
-    return;
+    return _mekit_barcode_get_error_message(t("Unregistered barcode!"));
   }
 
   drupal_goto("node/$nid", [], 303);
+  return TRUE;
 }
 
 /**
@@ -54,3 +54,25 @@ function _mekit_barcode_cleanup_barcode($barcode) {
   $barcode = preg_replace('/[^0-9]/', '', $barcode);
   return $barcode;
 }
+
+
+/**
+ * @param string $message
+ * @return array
+ */
+function _mekit_barcode_get_error_message($message) {
+  $answer = [
+    "error_page" => [
+      "message" => [
+        "#markup" => $message,
+        "#prefix" => '<div class="alert alert-danger" role="alert">',
+        "#suffix" => '</div>'
+      ],
+      "instructions" => [
+        /**/
+      ]
+    ]
+  ];
+  return $answer;
+}
+
