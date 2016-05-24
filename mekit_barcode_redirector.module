@@ -1,2 +1,56 @@
 <?php
 
+/**
+ * Implements hook_menu().
+ */
+function mekit_barcode_redirector_menu() {
+  return [
+    'barcode/search/%' => [
+      'page callback' => 'mekit_barcode_redirector_search',
+      'access arguments' => ['access content'],
+      'page arguments' => [2],
+    ]
+  ];
+}
+
+/**
+ * @param string $barcode
+ */
+function mekit_barcode_redirector_search($barcode) {
+  $barcode = _mekit_barcode_cleanup_barcode($barcode);
+  if (!$barcode || empty($barcode) || strlen($barcode) != 13) {
+    echo(t("Malformed barcode!"));
+    return;
+  }
+
+  $nid = _mekit_barcode_get_nid_by_barcode($barcode);
+  if (!$nid) {
+    echo(t("Unregistered barcode!"));
+    return;
+  }
+
+  drupal_goto("node/$nid", [], 303);
+}
+
+/**
+ * @param string $barcode
+ * @return bool|string
+ */
+function _mekit_barcode_get_nid_by_barcode($barcode) {
+  $query = db_select('field_data_field_bar_code', 'bc');
+  $query->innerJoin('field_data_field_package_variants', 'pv', "pv.bundle = 'product' AND pv.field_package_variants_target_id = bc.entity_id");
+  $query->addField('pv', 'entity_id', 'product_nid');
+  $query->where("REPLACE (bc.field_bar_code_value, ' ', '') = :barcode", [':barcode' => $barcode]);
+  $nid = $query->execute()->fetchField();
+  return $nid;
+}
+
+/**
+ * @param string $barcode
+ * @return string
+ */
+function _mekit_barcode_cleanup_barcode($barcode) {
+  $barcode = (string) $barcode;
+  $barcode = preg_replace('/[^0-9]/', '', $barcode);
+  return $barcode;
+}
