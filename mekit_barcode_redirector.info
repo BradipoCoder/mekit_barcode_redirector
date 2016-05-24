@@ -1,0 +1,7 @@
+name = Sepca - Barcode redirector
+description = Redirect to product page by identifying it through barcode passed in uri
+package = Sepca
+core = 7.x
+dependencies[] = inline_entity_form
+
+
