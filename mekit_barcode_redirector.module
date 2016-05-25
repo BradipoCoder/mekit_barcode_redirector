@@ -5,7 +5,7 @@
  */
 function mekit_barcode_redirector_menu() {
   return [
-    'barcode/search/%' => [
+    'barcode/redirect/%' => [
       'page callback' => 'mekit_barcode_redirector_search',
       'access arguments' => ['access content'],
       'page arguments' => [2],
