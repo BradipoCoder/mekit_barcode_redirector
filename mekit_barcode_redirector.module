@@ -37,10 +37,10 @@ function mekit_barcode_redirector_search($barcode) {
  * @return bool|string
  */
 function _mekit_barcode_get_nid_by_barcode($barcode) {
-  $query = db_select('field_data_field_bar_code', 'bc');
+  $query = db_select('field_data_field_barcode_ean13', 'bc');
   $query->innerJoin('field_data_field_package_variants', 'pv', "pv.bundle = 'product' AND pv.field_package_variants_target_id = bc.entity_id");
   $query->addField('pv', 'entity_id', 'product_nid');
-  $query->where("REPLACE (bc.field_bar_code_value, ' ', '') = :barcode", [':barcode' => $barcode]);
+  $query->where("REPLACE (bc.field_barcode_ean13_value, ' ', '') = :barcode", [':barcode' => $barcode]);
   $nid = $query->execute()->fetchField();
   return $nid;
 }
